@@ -3,12 +3,8 @@ PROJECTBRANCH=${1}
 PROJECTDIR=`pwd`
 set -xe
 
-# note: all with DOCKERMODIFIER != "" is highly experimental and needs "someway" to include webkit binaries
-# so without it will fail
-#DOCKERMODIFIER=_qt562
-
-DOCKERTAG=nixnote2/xenial${DOCKERMODIFIER}
-DOCKERFILE=./development/docker/Dockerfile.ubuntu_xenial${DOCKERMODIFIER}
+DOCKERTAG=nixnote2/focal
+DOCKERFILE=./development/docker/Dockerfile.ubuntu_focal
 
 function error_exit {
     echo "$0: ***********error_exit***********"
@@ -33,12 +29,6 @@ cd $PROJECTDIR
 docker build -t ${DOCKERTAG} -f ${DOCKERFILE} ./development/docker
 
 # stop after creating the image (e.g. you want to do the build manually)
-if [ ! -z ${DOCKERMODIFIER} ] ; then
-  echo "Docker image ${DOCKERTAG} created.. "
-  echo "DOCKERMODIFIER set to $DOCKERMODIFIER .. you need to provide webkit manually.."
-  exit 1
-fi
-
 if [ ! -d appdir ] ; then
   mkdir appdir || error_exit "mkdir appdir"
 fi

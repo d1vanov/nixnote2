@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # ############
-# !! EXPERIMENTAL build with qt >5.5 and community version of Qt WebKit https://github.com/annulen/webkit
+# !! EXPERIMENTAL build with qt >5.12 and community version of Qt WebKit https://github.com/annulen/webkit
 # ############
 
 PROJECTBRANCH=${1}
 PROJECTDIR=`pwd`
 set -xe
 
-NNQTVER=qt511
+NNQTVER=qt512
 DOCKERMODIFIER=_$NNQTVER
-DOCKERTAG=nixnote2/xenial${DOCKERMODIFIER}
-DOCKERFILE=./development/docker/Dockerfile.ubuntu_xenial${DOCKERMODIFIER}
+DOCKERTAG=nixnote2/focal${DOCKERMODIFIER}
+DOCKERFILE=./development/docker/Dockerfile.ubuntu_focal
 
 function error_exit {
     echo "$0: ***********error_exit***********"
@@ -51,7 +51,7 @@ if [ ! -d docker-build-${BUILD_TYPE} ]; then
 fi
 
 
-echo "EXPERIMENTAL build with qt >5.5 and community version of webkit https://github.com/annulen/webkit"
+echo "EXPERIMENTAL build with qt >5.12 and community version of webkit https://github.com/annulen/webkit"
 echo "(for now) rest of the commands should be entered manually in docker container console"
 
 PROG=nixnote2
