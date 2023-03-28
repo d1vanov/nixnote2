@@ -24,6 +24,6 @@ RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/down
         mv linuxdeployqt/AppRun linuxdeployqt/linuxdeployqt
 
 
-RUN cd $wdir && git clone "https://github.com/robert7/nixnote2.git" && cd nixnote2 && git checkout master
+RUN cd $wdir && git clone "https://github.com/d1vanov/nixnote2.git" && cd nixnote2 && git checkout experiment-docker-build-update
 
 CMD /bin/bash

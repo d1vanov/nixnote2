@@ -21,7 +21,7 @@ if [ ! -f src/main.cpp ]; then
 fi
 
 if [ -z "${PROJECTBRANCH}" ]; then
-    PROJECTBRANCH=master
+    PROJECTBRANCH=experiment-docker-build-update
 fi
 
 cd $PROJECTDIR
