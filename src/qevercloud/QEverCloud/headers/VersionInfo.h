@@ -26,7 +26,7 @@
  * This macro tells whether QEverCloud library uses QtWebEngine backend for
  * OAuth support (if it was built with OAuth support)
  */
-#define QEVERCLOUD_USE_QT_WEB_ENGINE 0
+#define QEVERCLOUD_USE_QT_WEB_ENGINE 1
 
 /**
  * This macro tells whether QEverCloud library was built with use of Q_NAMESPACE
