@@ -8,6 +8,6 @@ echo Build dir: ${BUILD_DIR}
 export VERSIONX=$(cat appdir/usr/share/nixnote2/version.txt)
 echo Version: ${VERSIONX}
 
-CMD="linuxdeployqt --appdir appdir"
+CMD="linuxdeployqt -v0 --appdir appdir"
 echo About to run: $CMD
 $CMD
