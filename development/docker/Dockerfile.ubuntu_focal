@@ -4,7 +4,7 @@ ARG wdir="/opt"
 WORKDIR $wdir
 
 ARG make_core=4
-ENV PATH="${wdir}/linuxdeployqt:${PATH}"
+ENV PATH="${wdir}/linuxdeployqt:${wdir}/linuxdeploy:${PATH}"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y software-properties-common
