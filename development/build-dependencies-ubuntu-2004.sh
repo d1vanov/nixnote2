@@ -11,6 +11,7 @@ sudo apt-get -y install git-core qt5-default build-essential \
                             wget curl make pkg-config \
                             libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev libcurl4-openssl-dev \
                             libpoppler-qt5-dev libqt5webkit5-dev qt5-qmake qttools5-dev-tools libqt5sql5-sqlite \
+                            qtwebengine5-dev qtwebengine5-dev-tools \
                             libhunspell-dev \
                             nixnote2-tidy
 

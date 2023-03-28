@@ -13,7 +13,7 @@ RUN add-apt-repository ppa:nixnote/nixnote2-stable -y && \
 
 # last line is for webkit build from source
 RUN apt-get update && apt-get install -y git-core build-essential \
-                              qt510-meta-full \
+                              qt510-meta-full qt510webengine \
                               wget curl make pkg-config \
                               libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev libcurl4-openssl-dev \
                               libpoppler-qt5-dev libhunspell-dev nixnote2-tidy \

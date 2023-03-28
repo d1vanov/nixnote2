@@ -26,7 +26,7 @@ RUN add-apt-repository ppa:beineri/opt-qt551-trusty -y && apt-get update
 RUN apt-get update && apt-get install -y git-core build-essential \
                               wget curl make \
                               libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev libcurl4-openssl-dev \
-                              qt55base \
+                              qt55base qt55webengine \
                               libpoppler-qt5-dev \
                               qttools5-dev-tools \
                               qt55tools qt55script qt55quick1 qt55webengine qt55webkit-examples qt55quickcontrols qt553d
