@@ -9,12 +9,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:nixnote/nixnote2-stable -y && apt-get update -qq
-RUN apt-get update && apt-get install -y git-core qt5-default build-essential \
+RUN apt-get update && apt-get install -y git-core qt5-default build-essential ccache \
                               wget curl make pkg-config \
                               qtwebengine5-dev qtwebengine5-dev-tools \
                               libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev libcurl4-openssl-dev \
                               libpoppler-qt5-dev libqt5webkit5-dev qt5-qmake qttools5-dev-tools libhunspell-dev nixnote2-tidy
 
+
+RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" && \
+        chmod a+x ./linuxdeploy-x86_64.AppImage && \
+        ./linuxdeploy-x86_64.AppImage --appimage-extract && \
+        mv squashfs-root linuxdeploy && \
+        mv linuxdeploy/AppRun linuxdeploy/linuxdeploy
 
 # install linuxdeploy-plugin-qt
 RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage" && \

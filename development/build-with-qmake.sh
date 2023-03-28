@@ -72,8 +72,8 @@ elif [ -d ${TIDY_LIB_DIR}/pkgconfig ] ; then
 fi
 
 
-echo ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} || error_exit "$0: qmake"
-${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} || error_exit "$0: qmake"
+echo ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
 
 make clean
 make -j$(nproc) || error_exit "$0: make"
