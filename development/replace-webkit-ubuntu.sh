@@ -39,7 +39,7 @@ cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/libexec/* /usr/lib/x86_64-linux-gnu/qt5/l
 
 echo "Copying custom QtWebKit mkspecs files"
 mkdir -p /usr/include/x86_64-linux-gnu/qt5/mkspecs
-cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/mkspecs/* /usr/include/x86_64-linux-gnu/qt5/mkspecs/
+cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/mkspecs/* /usr/lib/x86_64-linux-gnu/qt5/mkspecs/
 
 echo "Copying done. New QtWebKit files:"
 ls -la /usr/include/x86_64-linux-gnu/qt5/QtWebKit
