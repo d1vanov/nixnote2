@@ -10,6 +10,8 @@ if [ -z "${CUSTOM_WEBKIT_BINARIES_FOLDER}" ]; then
     exit 1
 fi
 
+apt-get install -f tree
+
 echo "Removing the files from official QtWebKit packages"
 rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKit
 rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKitWidgets
@@ -46,7 +48,10 @@ mkdir -p /usr/lib/x86_64-linux-gnu/qt5/mkspecs
 cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/mkspecs/* /usr/lib/x86_64-linux-gnu/qt5/mkspecs/
 
 echo "Hacky fixup of missing dependencies of custom QtWebKit"
-apt-get install -y nsight-systems libqt5qmlmodels5
+curl -fsSL http://mirrors.kernel.org/ubuntu/pool/universe/q/qtdeclarative-opensource-src/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb -o /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb
+dpkg -i /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb
+
+apt-get install -y nsight-systems
 ln -s /usr/lib/nsight-systems/Host-x86_64/libicudata.so.56 /usr/lib/x86_64-linux-gnu/libicudata.so.56
 ln -s /usr/lib/nsight-systems/Host-x86_64/libicui18n.so.56 /usr/lib/x86_64-linux-gnu/libicui18n.so.56
 ln -s /usr/lib/nsight-systems/Host-x86_64/libicuuc.so.56 /usr/lib/x86_64-linux-gnu/libicuuc.so.56
