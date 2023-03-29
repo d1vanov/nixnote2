@@ -4,7 +4,7 @@ ARG wdir="/opt"
 WORKDIR $wdir
 
 ARG make_core=4
-ENV PATH="${wdir}/linuxdeployqt:${wdir}/linuxdeploy:${PATH}"
+ENV PATH="${wdir}/linuxdeployqt:${wdir}/linuxdeploy-plugin-qt:${PATH}"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y software-properties-common
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y git-core qt5-default build-essential cc
                               libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev libcurl4-openssl-dev \
                               libpoppler-qt5-dev libqt5webkit5-dev qt5-qmake qttools5-dev-tools libhunspell-dev nixnote2-tidy
 
-
+# install linuxdeploy
 RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" && \
         chmod a+x ./linuxdeploy-x86_64.AppImage && \
         ./linuxdeploy-x86_64.AppImage --appimage-extract && \
@@ -26,8 +26,8 @@ RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy/releases/download/conti
 RUN wget -nv "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage" && \
         chmod a+x ./linuxdeploy-plugin-qt-x86_64.AppImage && \
         ./linuxdeploy-plugin-qt-x86_64.AppImage --appimage-extract && \
-        mv squashfs-root linuxdeployqt && \
-        mv linuxdeployqt/AppRun linuxdeployqt/linuxdeployqt
+        mv squashfs-root linuxdeploy-plugin-qt && \
+        mv linuxdeploy-plugin-qt/AppRun linuxdeploy-plugin-qt/linuxdeploy-plugin-qt
 
 
 RUN cd $wdir && git clone "https://github.com/d1vanov/nixnote2.git" && cd nixnote2 && git checkout experiment-docker-build-update

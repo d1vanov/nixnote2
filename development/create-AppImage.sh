@@ -14,12 +14,6 @@ fi
 export VERSIONX=$(cat appdir/usr/share/nixnote2/version.txt)
 echo Version: ${VERSIONX}
 
-export DEBUG=1
-
-CMD="linuxdeploy --desktop-file=$DESKTOP_FILE --appdir=appdir"
-echo About to run: $CMD
-$CMD
-
-CMD="linuxdeployqt --appdir=appdir"
+CMD="linuxdeploy --desktop-file=$DESKTOP_FILE --appdir=appdir --plugin qt --output appimage"
 echo About to run: $CMD
 $CMD
