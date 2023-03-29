@@ -10,8 +10,21 @@ if [ -z "${CUSTOM_WEBKIT_BINARIES_FOLDER}" ]; then
     exit 1
 fi
 
-echo "Removing the official QtWebKit packages"
-apt-get remove --purge -y libqt5webkit5-dev libqt5webkit5
+echo "Removing the files from official QtWebKit packages"
+rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKit
+rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKitWidgets
+rm -rf /usr/lib/x86_64-linux-gnu/cmake/Qt5WebKit
+rm -rf /usr/lib/x86_64-linux-gnu/cmake/Qt5WebKitWidgets
+rm -rf /usr/lib/x86_64-linux-gnu/libQt5WebKit.so*
+rm -rf /usr/lib/x86_64-linux-gnu/libQt5WebKitWidgets.so*
+rm -rf /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5WebKit.pc
+rm -rf /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5WebKitWidgets.pc
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_webkit.pri
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/modules/qt_lib_webkitwidgets.pri
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/libexec/QtWebNetworkProcess
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/libexec/QtWebPluginProcess
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/libexec/QtWebProcess
+rm -rf /usr/lib/x86_64-linux-gnu/qt5/libexec/QtWebStorageProcess
 
 echo "Copying custom QtWebKit headers"
 mkdir -p /usr/include/x86_64-linux-gnu/qt5
