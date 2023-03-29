@@ -6,6 +6,7 @@ set -xe
 BUILD_TYPE=${1}
 CLEAN=${2}
 TIDY_LIB_DIR=${3}
+WITH_QT_WEB_ENGINE=${4}
 CDIR=`pwd`
 
 function error_exit {
@@ -44,6 +45,18 @@ if [ ! -d "${TIDY_LIB_DIR}" ]; then
 fi
 echo "$0: libtidy is expected in: ${TIDY_LIB_DIR}"
 
+if [ -z "${WITH_QT_WEB_ENGINE}" ]; then
+   # by default will use QtWebEngine for OAuth because with default shipped QtWebKit it no longer works properly
+   WITH_QT_WEB_ENGINE=1
+elif [ "${WITH_QT_WEB_ENGINE}" == "yes" ] || [ "${WITH_QT_WEB_ENGINE}" == "y" ]; then
+   WITH_QT_WEB_ENGINE=1
+elif [ "${WITH_QT_WEB_ENGINE}" == "no" ] || [ "${WITH_QT_WEB_ENGINE}" == "n" ]; then
+   WITH_QT_WEB_ENGINE=0
+else
+  echo "Unrecognized WITH_QT_WEB_ENGINE option: $WITH_QT_WEB_ENGINE; must be yes or y or no or n"
+  exit 1
+fi
+
 if [ ! -d "${BUILD_DIR}" ]; then
   mkdir ${BUILD_DIR}
 fi
@@ -71,9 +84,13 @@ elif [ -d ${TIDY_LIB_DIR}/pkgconfig ] ; then
   export PKG_CONFIG_PATH=${TIDY_LIB_DIR}/pkgconfig
 fi
 
-
-echo ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
-${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+if [ "$WITH_QT_WEB_ENGINE" == "1" ]; then
+  echo ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} CONFIG+=oauth_webengine PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+  ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} CONFIG+=oauth_webengine PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+else
+  echo ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+  ${QMAKE_BINARY} CONFIG+=${BUILD_TYPE} PREFIX=appdir/usr QMAKE_RPATHDIR+=${TIDY_LIB_DIR} QMAKE_CXX="ccache g++" || error_exit "$0: qmake"
+fi
 
 make clean
 make -j$(nproc) || error_exit "$0: make"
