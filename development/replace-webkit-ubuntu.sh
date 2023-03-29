@@ -54,6 +54,7 @@ curl -fsSL http://mirrors.kernel.org/ubuntu/pool/universe/q/qtdeclarative-openso
 mkdir -p /tmp/libqt5qmlmodels5
 ar x /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb --output=/tmp/libqt5qmlmodels5
 tree /tmp/libqt5qmlmodels5
+apt-get install -y zstd
 tar -xvf /tmp/libqt5qmlmodels5/data.tar.zst -C /tmp/libqt5qmlmodels5
 cp /tmp/libqt5qmlmodels5/usr/lib/x86_64-linux-gnu/libQt5QmlModels.so.5 usr/lib/x86_64-linux-gnu/
 cp /tmp/libqt5qmlmodels5/usr/lib/x86_64-linux-gnu/libQt5QmlModels.so.5.15 usr/lib/x86_64-linux-gnu/
