@@ -48,9 +48,18 @@ mkdir -p /usr/lib/x86_64-linux-gnu/qt5/mkspecs
 cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/mkspecs/* /usr/lib/x86_64-linux-gnu/qt5/mkspecs/
 
 echo "Hacky fixup of missing dependencies of custom QtWebKit"
+# Custom QtWebKit depends on libqt5qmlmodels5 package but it is only available since Ubuntu 22.04
+# and we are building on Ubuntu 20.04. So extracring the lib from the package for 22.04.
 curl -fsSL http://mirrors.kernel.org/ubuntu/pool/universe/q/qtdeclarative-opensource-src/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb -o /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb
-dpkg -i /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb
+mkdir -p /tmp/libqt5qmlmodels5
+ar x /tmp/libqt5qmlmodels5_5.15.3+dfsg-1_amd64.deb --output=/tmp/libqt5qmlmodels5
+tar -xvf /tmp/libqt5qmlmodels5/data.tar.zst -C /tmp/libqt5qmlmodels5
+cp /tmp/libqt5qmlmodels5/usr/lib/x86_64-linux-gnu/libQt5QmlModels.so.5 usr/lib/x86_64-linux-gnu/
+cp /tmp/libqt5qmlmodels5/usr/lib/x86_64-linux-gnu/libQt5QmlModels.so.5.15 usr/lib/x86_64-linux-gnu/
+cp /tmp/libqt5qmlmodels5/usr/lib/x86_64-linux-gnu/libQt5QmlModels.so.5.15.3 usr/lib/x86_64-linux-gnu/
 
+# Custom QtWebKit depends on some older versions of icu libs which are available in bundled form in nsight-systems
+# package in Ubuntu 20.04.
 apt-get install -y nsight-systems
 ln -s /usr/lib/nsight-systems/Host-x86_64/libicudata.so.56 /usr/lib/x86_64-linux-gnu/libicudata.so.56
 ln -s /usr/lib/nsight-systems/Host-x86_64/libicui18n.so.56 /usr/lib/x86_64-linux-gnu/libicui18n.so.56
