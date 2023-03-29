@@ -16,10 +16,10 @@ echo Version: ${VERSIONX}
 
 export DEBUG=1
 
-CMD="linuxdeploy --desktop-file=$DESKTOP_FILE"
+CMD="linuxdeploy --desktop-file=$DESKTOP_FILE --appdir=appdir"
 echo About to run: $CMD
 $CMD
 
-CMD="linuxdeployqt --appdir appdir"
+CMD="linuxdeployqt --appdir=appdir"
 echo About to run: $CMD
 $CMD
