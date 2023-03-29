@@ -8,7 +8,7 @@ PROJECTBRANCH=${1}
 PROJECTDIR=`pwd`
 set -xe
 
-NNQTVER=qt512
+NNQTVER=qt511
 DOCKERMODIFIER=_$NNQTVER
 DOCKERTAG=nixnote2/focal${DOCKERMODIFIER}
 DOCKERFILE=./development/docker/Dockerfile.ubuntu_focal
@@ -63,7 +63,7 @@ time docker run \
    -v $PROJECTDIR/docker-build-${BUILD_TYPE}:/opt/nixnote2/qmake-build-${BUILD_TYPE} \
    -v $PROJECTDIR/docker-build-${BUILD_TYPE}-t:/opt/nixnote2/qmake-build-${BUILD_TYPE}-t \
    -it ${DOCKERTAG} \
-      /bin/bash -c "cd /opt && wget https://github.com/robert7/nixnote2-packaging/releases/download/v2.1.2/qtwebkit-$NNQTVER-binaries.tgz && cd /opt/$NNQTVER && tar -xf /opt/qtwebkit-$NNQTVER-binaries.tgz && cd /opt/nixnote2 && git fetch && git checkout $PROJECTBRANCH && git pull && source /opt/qt5*/bin/qt*-env.sh && ./development/build-with-qmake.sh ${BUILD_TYPE} noclean /usr/lib/nixnote2/tidy && cd /opt/nixnote2 && unset QTDIR && unset QT_PLUGIN_PATH && unset QT_BASE_DIR && unset LD_LIBRARY_PATH && linuxdeployqt $DESKTOP_FILE -appimage && mv *.AppImage appdir && chmod -R a+rwx appdir"
+      /bin/bash -c "cd nixnote2 && git fetch && git checkout $PROJECTBRANCH && git reset --hard origin/$PROJECTBRANCH && rm -rf qtwebkit-$NNQTVER-binaries.tgz && curl -fsSL https://github.com/robert7/nixnote2-packaging/releases/download/v2.1.2/qtwebkit-$NNQTVER-binaries.tgz -o /opt/qtwebkit-$NNQTVER-binaries.tgz && ls -la /opt/qtwebkit-$NNQTVER-binaries.tgz && mkdir -p /opt/qtwebkit-$NNQTVER-binaries && tar -xf /opt/qtwebkit-$NNQTVER-binaries.tgz -C /opt/qtwebkit-$NNQTVER-binaries && ./development/replace-webkit-ubuntu.sh /opt/qtwebkit-$NNQTVER-binaries && ./development/build-with-qmake.sh ${BUILD_TYPE} noclean /usr/lib/nixnote2/tidy no && ./development/run-tests.sh ${BUILD_TYPE} noclean /usr/lib/nixnote2/tidy && ./development/create-AppImage.sh && mv *.AppImage appdir && chmod -R a+rwx appdir"
 
 ###################################################################################################################################
 # manually run following commands in docker container console:
