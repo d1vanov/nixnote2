@@ -8,7 +8,7 @@
 #ifndef QEVERCLOUD_VERSION_INFO_H
 #define QEVERCLOUD_VERSION_INFO_H
 
-#include "Export.h"
+#include <Export.h>
 
 #include <QString>
 
@@ -26,7 +26,7 @@
  * This macro tells whether QEverCloud library uses QtWebEngine backend for
  * OAuth support (if it was built with OAuth support)
  */
-#define QEVERCLOUD_USE_QT_WEB_ENGINE 1
+#define QEVERCLOUD_USE_QT_WEB_ENGINE $$QEVERCLOUD_USE_QT_WEB_ENGINE
 
 /**
  * This macro tells whether QEverCloud library was built with use of Q_NAMESPACE
@@ -38,7 +38,7 @@
  * This macro is set to a string holding the information about
  * the current QEverCloud build
  */
-#define QEVERCLOUD_BUILD_INFO "nixnote2 integrated"
+#define QEVERCLOUD_BUILD_INFO \"nixnote2 integrated\"
 
 /**
  * This macro is set to the major version number of QEverCloud
