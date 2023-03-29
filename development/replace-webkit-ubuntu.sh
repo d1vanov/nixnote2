@@ -10,9 +10,6 @@ if [ -z "${CUSTOM_WEBKIT_BINARIES_FOLDER}" ]; then
     exit 1
 fi
 
-echo "Installing tree"
-apt-get install -y tree
-
 echo "Removing the files from official QtWebKit packages"
 rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKit
 rm -rf /usr/include/x86_64-linux-gnu/qt5/QtWebKitWidgets
@@ -48,6 +45,8 @@ echo "Copying custom QtWebKit mkspecs files"
 mkdir -p /usr/lib/x86_64-linux-gnu/qt5/mkspecs
 cp -r ${CUSTOM_WEBKIT_BINARIES_FOLDER}/mkspecs/* /usr/lib/x86_64-linux-gnu/qt5/mkspecs/
 
-echo "Copying done. New QtWebKit files:"
-tree /usr/include/x86_64-linux-gnu/qt5
-tree /usr/lib/x86_64-linux-gnu
+echo "Hacky fixup of missing dependencies of custom QtWebKit"
+apt-get install -y nsight-systems libqt5qmlmodels5
+ln -s /usr/lib/nsight-systems/Host-x86_64/libicudata.so.56 /usr/lib/x86_64-linux-gnu/libicudata.so.56
+ln -s /usr/lib/nsight-systems/Host-x86_64/libicui18n.so.56 /usr/lib/x86_64-linux-gnu/libicui18n.so.56
+ln -s /usr/lib/nsight-systems/Host-x86_64/libicuuc.so.56 /usr/lib/x86_64-linux-gnu/libicuuc.so.56
