@@ -1,6 +1,6 @@
-QT += core gui widgets printsupport webkit webkitwidgets webengine webenginewidgets sql network xml dbus qml
+QT += core gui widgets printsupport webkit webkitwidgets sql network xml dbus qml
+
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
-DEFINES += QEVERCLOUD_USE_QT_WEB_ENGINE=1
 unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += poppler-qt5 libcurl tidy hunspell
@@ -17,6 +17,7 @@ win32:LIBS += -L"$$PWD/winlib" -lhunspell-$$[HUNSPELL_VERSION]
 win32:RC_ICONS += "$$PWD/resources/images/windowIcon.ico"
 
 INCLUDEPATH += "$$PWD/src/qevercloud/QEverCloud/headers"
+INCLUDEPATH += "$$OUT_PWD"
 
 mac {
     TARGET = NixNote2
@@ -40,6 +41,28 @@ CONFIG(debug, debug|release) {
 }
 OBJECTS_DIR = $${DESTDIR}
 MOC_DIR = $${DESTDIR}
+
+oauth_webengine {
+    win32-g++ {
+        error("Cannot use QtWebEngine with MinGW build")
+    } else {
+        message("Using QtWebEngine for OAuth")
+        QT += webengine webenginewidgets
+        QEVERCLOUD_USE_QT_WEB_ENGINE = 1
+        DEFINES += QEVERCLOUD_USE_QT_WEB_ENGINE=1
+    }
+} else {
+    message("Using QtWebKit for OAuth")
+    !win32-g++ {
+        warning("Consider adding CONFIG+=oauth_webengine to qmake invocation to use QtWebEngine for OAuth; QtWebKit has known problems with it, OAuth may not work!")
+    }
+    QEVERCLOUD_USE_QT_WEB_ENGINE = 0
+    DEFINES += QEVERCLOUD_USE_QT_WEB_ENGINE=0
+}
+
+qevercloud_version_info.input = src/qevercloud/QEverCloud/headers/VersionInfo.h.in
+qevercloud_version_info.output = $$OUT_PWD/VersionInfo.h
+QMAKE_SUBSTITUTES += qevercloud_version_info
 
 SOURCES += \
     src/application.cpp \
