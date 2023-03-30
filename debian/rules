@@ -27,6 +27,8 @@ else
   QMAKE_OPTIONS += CONFIG*=release CONFIG-=debug
 endif
 
+QMAKE_OPTIONS += CONFIG+=oauth_webengine
+
 # Teach qmake about CFLAGS, poor qmake doesn't know about it...
 #
 QMAKE_OPTIONS += QMAKE_CXXFLAGS_RELEASE='$(CFLAGS)' \
