@@ -209,6 +209,8 @@ SOURCES += \
     src/qevercloud/QEverCloud/src/generated/Types.cpp \
     src/qevercloud/QEverCloud/src/Globals.cpp \
     src/qevercloud/QEverCloud/src/Http.cpp \
+    src/qevercloud/QEverCloud/src/HttpRequestParser.cpp \
+    src/qevercloud/QEverCloud/src/HttpUtils.cpp \
     src/qevercloud/QEverCloud/src/InkNoteImageDownloader.cpp \
     src/qevercloud/QEverCloud/src/Log.cpp \
     src/qevercloud/QEverCloud/src/NetworkCookieJar.cpp \

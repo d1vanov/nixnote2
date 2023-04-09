@@ -23,8 +23,6 @@
 
 namespace qevercloud {
 
-////////////////////////////////////////////////////////////////////////////////
-
 ReplyFetcher::ReplyFetcher(QObject * parent) :
     QObject(parent),
     m_pTicker(new QTimer(this))
@@ -84,7 +82,7 @@ void ReplyFetcher::start(
 #elif QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QObject::connect(
         m_pReply.get(),
-        QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+        qOverload<QNetworkReply::NetworkError>(&QNetworkReply::error),
         this,
         &ReplyFetcher::onError);
 #else
@@ -213,9 +211,13 @@ QByteArray simpleDownload(
     QEventLoop loop;
     QObject::connect(
         pFetcher,
-        SIGNAL(replyFetched(ReplyFetcher*)),
+        &ReplyFetcher::replyFetched,
         &loop,
-        SLOT(quit()));
+        [&loop](ReplyFetcher * rf)
+        {
+            Q_UNUSED(rf);
+            loop.quit();
+        });
 
     auto * fetcherLauncher = new ReplyFetcherLauncher(
         pFetcher,
@@ -264,7 +266,8 @@ QNetworkRequest createEvernoteRequest(
     request.setRawHeader("Accept", "application/x-thrift");
 
     if (!cookies.isEmpty()) {
-        request.setHeader(QNetworkRequest::CookieHeader, QVariant::fromValue(cookies));
+        request.setHeader(
+            QNetworkRequest::CookieHeader, QVariant::fromValue(cookies));
     }
 
     return request;
