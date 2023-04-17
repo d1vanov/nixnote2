@@ -36,6 +36,6 @@ RUN wget -nv "https://github.com/AppImage/AppImageKit/releases/download/continuo
         mv squashfs-root appimagetool && \
         mv appimagetool/AppRun appimagetool/appimagetool
 
-RUN cd $wdir && git clone "https://github.com/robert7/nixnote2.git" && cd nixnote2 && git checkout master
+RUN cd $wdir && git clone "https://github.com/d1vanov/nixnote2.git" && cd nixnote2 && git checkout master
 
 CMD /bin/bash
