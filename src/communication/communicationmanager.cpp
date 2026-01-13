@@ -51,7 +51,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <curl/easy.h>
 #endif // End windows check
 
-#include <qtconcurrentmap.h>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QMutexLocker>
 
 #include "src/utilities/debugtool.h"

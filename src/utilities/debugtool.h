@@ -29,7 +29,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef DEBUGTOOL_H
 #define DEBUGTOOL_H
 
-#include "src/qevercloud/QEverCloud/headers/QEverCloud.h"
+#include "src/qevercloud/include/qevercloud/QEverCloud.h"
+
+#include <optional>
 
 using namespace qevercloud;
 
@@ -37,15 +39,15 @@ class DebugTool
 {
 private:
     // These are generic dumpField functions called by the other methods.
-    void dumpField(Optional<QString> field, QString name);
-    void dumpField(Optional<qint32> field, QString name);
-    void dumpField(Optional<bool> field, QString name);
-    void dumpField(Optional<short int> field, QString name);
-    void dumpField(Optional<long long> field, QString name);
-    void dumpField(Optional<QByteArray> field, QString name, bool hexValue=false);
-    void dumpField(Optional<QStringList> field, QString name);
-    void dumpField(Optional< QList< QString> > field, QString name);
-    void dumpField(Optional<double> field, QString name);
+    void dumpField(std::optional<QString> field, QString name);
+    void dumpField(std::optional<qint32> field, QString name);
+    void dumpField(std::optional<bool> field, QString name);
+    void dumpField(std::optional<short int> field, QString name);
+    void dumpField(std::optional<long long> field, QString name);
+    void dumpField(std::optional<QByteArray> field, QString name, bool hexValue=false);
+    void dumpField(std::optional<QStringList> field, QString name);
+    void dumpField(std::optional< QList< QString> > field, QString name);
+    void dumpField(std::optional<double> field, QString name);
     void dumpResource(Resource resource);           // Dump a resource to the log
 
 public:

@@ -20,10 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef DATASTORETABLE_H
 #define DATASTORETABLE_H
 
-#include "src/global.h"
 #include <QSqlTableModel>
 #include <QList>
-#include "src/sql/databaseconnection.h"
 
 class DatabaseConnection;
 
@@ -36,7 +34,7 @@ class DatabaseConnection;
 //***********************************************************
 using namespace std;
 
-#include "src/qevercloud/QEverCloud/headers/QEverCloud.h"
+#include "src/qevercloud/include/qevercloud/QEverCloud.h"
 using namespace qevercloud;
 
 

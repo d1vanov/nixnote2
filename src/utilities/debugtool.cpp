@@ -29,10 +29,10 @@ DebugTool::DebugTool() = default;
 //************************************
 void DebugTool::dumpTag(Tag tag) {
     QLOG_DEBUG() << "*** Dumping Tag ***";
-    dumpField(tag.guid, "guid");
-    dumpField(tag.name, "name");
-    dumpField(tag.parentGuid, "parent");
-    dumpField(tag.updateSequenceNum, "USN");
+    dumpField(tag.guid(), "guid");
+    dumpField(tag.name(), "name");
+    dumpField(tag.parentGuid(), "parent");
+    dumpField(tag.updateSequenceNum(), "USN");
     QLOG_DEBUG() << "*** Tag Dump complete ***";
 }
 
@@ -42,18 +42,18 @@ void DebugTool::dumpTag(Tag tag) {
 //************************************
 void DebugTool::dumpSavedSearch(SavedSearch &search) {
     QLOG_DEBUG() << "*** Dumping Saved Search ***";
-    dumpField(search.guid, "guid");
-    dumpField(search.name, "name");
-    dumpField(search.query, "query");
-    dumpField(search.updateSequenceNum, "USN");
-    if (search.format.isSet())
-        QLOG_DEBUG() << "format:" << search.format << ":";
+    dumpField(search.guid(), "guid");
+    dumpField(search.name(), "name");
+    dumpField(search.query(), "query");
+    dumpField(search.updateSequenceNum(), "USN");
+    if (search.format().has_value())
+        QLOG_DEBUG() << "format:" << *search.format() << ":";
     else QLOG_DEBUG() << "format not found.";
-    if (search.scope.isSet()) {
-        SavedSearchScope scope = search.scope;
-        dumpField(scope.includeAccount, "includeAccount");
-        dumpField(scope.includePersonalLinkedNotebooks, "includePersonalLinkedNotebooks");
-        dumpField(scope.includeBusinessLinkedNotebooks, "includeBusinessLinkedNotebooks");
+    if (search.scope().has_value()) {
+        SavedSearchScope scope = *search.scope();
+        dumpField(scope.includeAccount(), "includeAccount");
+        dumpField(scope.includePersonalLinkedNotebooks(), "includePersonalLinkedNotebooks");
+        dumpField(scope.includeBusinessLinkedNotebooks(), "includeBusinessLinkedNotebooks");
     } else QLOG_DEBUG() << "search scope not found.";
 
     QLOG_DEBUG() << "*** Saved Search Dump Complete ***";
@@ -68,49 +68,49 @@ void DebugTool::dumpNote(const Note &note) {
         return;
     }
 
-    QLOG_DEBUG() << ">>>>>>>>> note guid=" << note.guid;
-    dumpField(note.active, "active");
-    dumpField(note.title, "title");
-    dumpField(note.content, "content");
-    dumpField(note.contentHash, "contentHash", true);
-    dumpField(note.contentLength, "contentLength");
-    dumpField(note.created, "created");
-    dumpField(note.updated, "updated");
-    dumpField(note.deleted, "deleted");
-    dumpField(note.updateSequenceNum, "USN");
-    dumpField(note.tagGuids, "tag guids");
-    dumpField(note.tagNames, "tag names");
+    QLOG_DEBUG() << ">>>>>>>>> note guid=" << note.guid().value_or(QString{});
+    dumpField(note.active(), "active");
+    dumpField(note.title(), "title");
+    dumpField(note.content(), "content");
+    dumpField(note.contentHash(), "contentHash", true);
+    dumpField(note.contentLength(), "contentLength");
+    dumpField(note.created(), "created");
+    dumpField(note.updated(), "updated");
+    dumpField(note.deleted(), "deleted");
+    dumpField(note.updateSequenceNum(), "USN");
+    dumpField(note.tagGuids(), "tag guids");
+    dumpField(note.tagNames(), "tag names");
 
-    if (!note.attributes.isSet()) {
+    if (!note.attributes().has_value()) {
         QLOG_DEBUG() << "no note attributes found.";
     } else {
-        NoteAttributes attributes = note.attributes;
-        dumpField(attributes.subjectDate, "subject date");
-        dumpField(attributes.latitude, "latitude");
-        dumpField(attributes.longitude, "longitude");
-        dumpField(attributes.altitude, "altitude");
-        dumpField(attributes.author, "author");
-        dumpField(attributes.source, "source");
-        dumpField(attributes.sourceURL, "sourceURL");
-        dumpField(attributes.sourceApplication, "sourceApplication");
-        dumpField(attributes.shareDate, "shareDate");
-        dumpField(attributes.reminderOrder, "reminderOrder");
-        dumpField(attributes.reminderDoneTime, "reminderDoneTime");
-        dumpField(attributes.reminderTime, "reminderTime");
-        dumpField(attributes.placeName, "placeName");
-        dumpField(attributes.contentClass, "contentClass");
-        dumpField(attributes.lastEditedBy, "lastEditedBy");
-        dumpField(attributes.creatorId, "creatorId");
-        dumpField(attributes.lastEditorId, "lastEditorId");
+        const NoteAttributes & attributes = *note.attributes();
+        dumpField(attributes.subjectDate(), "subject date");
+        dumpField(attributes.latitude(), "latitude");
+        dumpField(attributes.longitude(), "longitude");
+        dumpField(attributes.altitude(), "altitude");
+        dumpField(attributes.author(), "author");
+        dumpField(attributes.source(), "source");
+        dumpField(attributes.sourceURL(), "sourceURL");
+        dumpField(attributes.sourceApplication(), "sourceApplication");
+        dumpField(attributes.shareDate(), "shareDate");
+        dumpField(attributes.reminderOrder(), "reminderOrder");
+        dumpField(attributes.reminderDoneTime(), "reminderDoneTime");
+        dumpField(attributes.reminderTime(), "reminderTime");
+        dumpField(attributes.placeName(), "placeName");
+        dumpField(attributes.contentClass(), "contentClass");
+        dumpField(attributes.lastEditedBy(), "lastEditedBy");
+        dumpField(attributes.creatorId(), "creatorId");
+        dumpField(attributes.lastEditorId(), "lastEditorId");
     }
     dumpNoteResources(note);
 
-    QLOG_DEBUG() << "<<<<<<<<< note guid=" << note.guid;
+    QLOG_DEBUG() << "<<<<<<<<< note guid=" << note.guid().value_or(QString{});
 }
 
 void DebugTool::dumpNoteResources(const Note &note) {
-    if (note.resources.isSet()) {
-        QList<Resource> resources = note.resources;
+    if (note.resources().has_value()) {
+        const QList<Resource> & resources = *note.resources();
         int resourceCount = resources.size();
         for (int i = 0; i < resourceCount; i++) {
             QLOG_DEBUG() << "resource #" << (i + 1) << "/" << resourceCount;
@@ -124,26 +124,26 @@ void DebugTool::dumpNoteResources(const Note &note) {
 // Dump a resource to the debug log
 //************************************
 void DebugTool::dumpResource(Resource r) {
-    QLOG_DEBUG() << "guid=" << r.guid
-                 << ", noteGuid=" << r.noteGuid
-                 << ", mime=" << r.mime
-                 << ", width=" << r.width
-                 << ", height=" << r.height
-                 << ", duration=" << r.duration
-                 << ", active=" << r.active
-                 << ", updateSequenceNum=" << r.updateSequenceNum;
+    QLOG_DEBUG() << "guid=" << r.guid().value_or(QString{})
+                 << ", noteGuid=" << r.noteGuid().value_or(QString{})
+                 << ", mime=" << r.mime().value_or(QString{})
+                 << ", width=" << (r.width().has_value() ? QString::number(*r.width()) : QString{})
+                 << ", height=" << (r.height().has_value() ? QString::number(*r.height()) : QString{})
+                 << ", duration=" << (r.duration().has_value() ? QString::number(*r.duration()) : QString{})
+                 << ", active=" << (r.active().has_value() ? (*r.active() ? "true" : "false") : "")
+                 << ", updateSequenceNum=" << (r.updateSequenceNum().has_value() ? QString::number(*r.updateSequenceNum()) : QString{});
 
-    if (r.data.isSet()) {
+    if (r.data().has_value()) {
         QLOG_DEBUG() << "resource data:";
-        dumpData(r.data);
+        dumpData(*r.data());
     }
-    if (r.recognition.isSet()) {
+    if (r.recognition().has_value()) {
         QLOG_DEBUG() << "resource recognition data:";
-        dumpData(r.data);
+        dumpData(*r.recognition());
     }
-    if (r.alternateData.isSet()) {
+    if (r.alternateData().has_value()) {
         QLOG_DEBUG() << "resource alternate data:";
-        dumpData(r.alternateData);
+        dumpData(*r.alternateData());
     }
 }
 
@@ -152,8 +152,8 @@ void DebugTool::dumpResource(Resource r) {
 // Dump a generic data segment to the log
 //******************************************
 void DebugTool::dumpData(Data d) {
-    dumpField(d.bodyHash, "bodyHash", true);
-    dumpField(d.size, "size");
+    dumpField(d.bodyHash(), "bodyHash", true);
+    dumpField(d.size(), "size");
 }
 
 
