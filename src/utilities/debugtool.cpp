@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ***********************************************************************************/
 
 #include "debugtool.h"
-#include "src/global.h"
+#include "src/logger/qslog.h"
 
 
 DebugTool::DebugTool() = default;
@@ -162,28 +162,31 @@ void DebugTool::dumpData(Data d) {
 //************************************
 void DebugTool::dumpNotebook(Notebook n) {
     QLOG_DEBUG() << "*** Dumping Notebook ***";
-    dumpField(n.guid, "guid");
-    dumpField(n.name, "name");
-    dumpField(n.updateSequenceNum, "USN");
-    dumpField(n.defaultNotebook, "defaultNotebook");
-    dumpField(n.serviceCreated, "serviceCreated");
-    dumpField(n.serviceUpdated, "serviceUpdate");
-    dumpField(n.stack, "stack");
-    dumpField(n.published, "published");
-    if (n.publishing.isSet()) {
+    dumpField(n.guid(), "guid");
+    dumpField(n.name(), "name");
+    dumpField(n.updateSequenceNum(), "USN");
+    dumpField(n.defaultNotebook(), "defaultNotebook");
+    dumpField(n.serviceCreated(), "serviceCreated");
+    dumpField(n.serviceUpdated(), "serviceUpdate");
+    dumpField(n.stack(), "stack");
+    dumpField(n.published(), "published");
+    if (n.publishing().has_value()) {
         QLOG_DEBUG() << "publishing data:";
-        Publishing p = n.publishing;
-        dumpField(p.uri, "uri");
-        QLOG_DEBUG() << "order:" << p.order << ":";
-        dumpField(p.publicDescription, "publicDescription");
+        const Publishing & p = *n.publishing();
+        dumpField(p.uri(), "uri");
+        if (p.order())
+        {
+            QLOG_DEBUG() << "order:" << *p.order();
+        }
+        dumpField(p.publicDescription(), "publicDescription");
     } else QLOG_DEBUG() << "publishing data not found";
-    if (n.businessNotebook.isSet()) {
+    if (n.businessNotebook().has_value()) {
         QLOG_DEBUG() << "businessnotebook data:";
-        BusinessNotebook b = n.businessNotebook;
-        dumpField(b.notebookDescription, "notebookDescription");
-        dumpField(b.recommended, "recommended");
-        if (b.privilege.isSet()) {
-            int i = static_cast<int>(b.privilege.ref());
+        const BusinessNotebook & b = *n.businessNotebook();
+        dumpField(b.notebookDescription(), "notebookDescription");
+        dumpField(b.recommended(), "recommended");
+        if (b.privilege().has_value()) {
+            int i = static_cast<int>(*b.privilege());
             QLOG_DEBUG() << "privilege:" << i;
         }
     } else {
@@ -203,16 +206,16 @@ void DebugTool::dumpNotebook(Notebook n) {
 //* debug log.
 //*******************************************************
 
-void DebugTool::dumpField(Optional<QString> field, QString name) {
-    if (field.isSet()) {
-        QString &fieldValue = field.ref();
+void DebugTool::dumpField(std::optional<QString> field, QString name) {
+    if (field.has_value()) {
+        const QString &fieldValue = *field;
         if (fieldValue.length() > 100) {
             QString fname = QString("attr-").append(name);
             // just a hack for better logging
             if (name == "content") {
                 fname = "note-content.xml";
             }
-            QLOG_DEBUG_FILE(fname, field);
+            QLOG_DEBUG_FILE(fname, *field);
         } else {
             QLOG_DEBUG() << name << ":" << fieldValue << ":";
         }
@@ -220,58 +223,60 @@ void DebugTool::dumpField(Optional<QString> field, QString name) {
 }
 
 
-void DebugTool::dumpField(Optional<bool> field, QString name) {
-    if (field.isSet()) {
-        QLOG_DEBUG() << name << ":" << field << ":";
+void DebugTool::dumpField(std::optional<bool> field, QString name) {
+    if (field.has_value()) {
+        QLOG_DEBUG() << name << ":" << *field << ":";
     }
 }
 
 
-void DebugTool::dumpField(Optional<double> field, QString name) {
-    if (field.isSet()) {
-        QLOG_DEBUG() << name << ":" << field << ":";
+void DebugTool::dumpField(std::optional<double> field, QString name) {
+    if (field.has_value()) {
+        QLOG_DEBUG() << name << ":" << *field << ":";
     }
 }
 
 
-void DebugTool::dumpField(Optional<qint32> field, QString name) {
-    if (field.isSet()) {
-        QLOG_DEBUG() << name << ":" << field << ":";
+void DebugTool::dumpField(std::optional<qint32> field, QString name) {
+    if (field.has_value()) {
+        QLOG_DEBUG() << name << ":" << *field << ":";
     }
 }
 
 
-void DebugTool::dumpField(Optional<long long> field, QString name) {
-    if (field.isSet()) {
-        QLOG_DEBUG() << name << ":" << field << ":";
+void DebugTool::dumpField(std::optional<long long> field, QString name) {
+    if (field.has_value()) {
+        QLOG_DEBUG() << name << ":" << *field << ":";
     }
 }
 
 
-void DebugTool::dumpField(Optional<short int> field, QString name) {
-    if (field.isSet()) {
-        QLOG_DEBUG() << name << ":" << field << ":";
+void DebugTool::dumpField(std::optional<short int> field, QString name) {
+    if (field.has_value()) {
+        QLOG_DEBUG() << name << ":" << *field << ":";
     }
 }
 
 
-void DebugTool::dumpField(Optional<QByteArray> field, QString name, bool hexValue) {
-    if (field.isSet()) {
+void DebugTool::dumpField(std::optional<QByteArray> field, QString name, bool hexValue) {
+    if (field.has_value()) {
         if (hexValue) {
-            QByteArray hex = field;
+            const QByteArray & hex = *field;
             QLOG_DEBUG() << name << ":" << hex.toHex() << ":";
-        } else QLOG_DEBUG() << name << ":" << field << ":";
+        } else {
+            QLOG_DEBUG() << name << ":" << *field << ":";
+        }
     }
 }
 
 
-void DebugTool::dumpField(Optional<QStringList> field, QString name) {
-    if (!field.isSet()) {
+void DebugTool::dumpField(std::optional<QStringList> field, QString name) {
+    if (!field.has_value()) {
         QLOG_DEBUG() << name << " is empty (QStringList)";
         return;
     }
 
-    QStringList fields = field;
+    const QStringList & fields = *field;
     QLOG_DEBUG() << name << " has " << fields.size() << " entries.";
     for (int i = 0; i < fields.size(); i++) {
         QLOG_DEBUG() << "#" << i << ":" << fields[i];
@@ -279,13 +284,13 @@ void DebugTool::dumpField(Optional<QStringList> field, QString name) {
 }
 
 
-void DebugTool::dumpField(Optional<QList<QString> > field, QString name) {
-    if (!field.isSet()) {
+void DebugTool::dumpField(std::optional<QList<QString> > field, QString name) {
+    if (!field.has_value()) {
         QLOG_DEBUG() << name << " is empty (QList<QString>)";
         return;
     }
 
-    QList<QString> fields = field;
+    const QList<QString> & fields = *field;
     QLOG_DEBUG() << name << " has " << fields.size() << " entries.";
     for (int i = 0; i < fields.size(); i++) {
         QLOG_DEBUG() << "#" << i << ":" << fields[i];

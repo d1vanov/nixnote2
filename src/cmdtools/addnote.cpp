@@ -112,32 +112,32 @@ qint32 AddNote::createResource(Resource &r, int sequence, QByteArray data,  QStr
 
     QString guid =  QString::number(rlid);
     NoteTable noteTable(global.db);
-    r.guid = guid;
-    r.noteGuid = noteTable.getGuid(lid);
-    QString noteguid = r.noteGuid;
+    r.setGuid(guid);
+    r.setNoteGuid(noteTable.getGuid(lid));
+    QString noteguid = *r.noteGuid();
     if (noteguid == "")
         return 0;
-    r.mime = mime;
-    r.active = true;
-    r.updateSequenceNum = sequence;
-    r.width = 0;
-    r.height = 0;
-    r.duration = 0;
+    r.setMime(mime);
+    r.setActive(true);
+    r.setUpdateSequenceNum(sequence);
+    r.setWidth(0);
+    r.setHeight(0);
+    r.setDuration(0);
     ResourceAttributes a;
-    if (r.attributes.isSet())
-        a = r.attributes;
-    a.attachment = attachment;
+    if (r.attributes().has_value())
+        a = *r.attributes();
+    a.setAttachment(attachment);
     if (filename != "") {
-        a.fileName = filename;
+        a.setFileName(filename);
     }
 
     Data d;
-    d.body = data;
-    d.bodyHash = hash;
-    d.size = data.size();
+    d.setBody(data);
+    d.setBodyHash(hash);
+    d.setSize(data.size());
 
-    r.data = d;
-    r.attributes = a;
+    r.setData(d);
+    r.setAttributes(a);
     ResourceTable resourceTable(global.db);
     resourceTable.add(rlid, r, true, lid);
 

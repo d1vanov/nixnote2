@@ -202,7 +202,7 @@ int CmdLineTool::addNote(StartupConfig config) {
             content.append("<br>");
             content.replace("\n","<br>");
         }
-        config.newNote->content = QString::fromAscii(content);
+        config.newNote->content = QString::fromLocal8Bit(content);
     }
 
     if (!config.newNote->content.contains("<body")) {
@@ -221,18 +221,18 @@ int CmdLineTool::addNote(StartupConfig config) {
     global.db = new DatabaseConnection(NN_DB_CONNECTION_NAME);  // Startup the database
     NUuid uuid;
     Note newNote;
-    newNote.content = config.newNote->content;
-    newNote.active = true;
-    newNote.created = QDateTime::currentMSecsSinceEpoch();
-    newNote.guid = uuid.create();
+    newNote.setContent(config.newNote->content);
+    newNote.setActive(true);
+    newNote.setCreated(QDateTime::currentMSecsSinceEpoch());
+    newNote.setGuid(uuid.create());
     if (config.newNote->title != "")
-        newNote.title = config.newNote->title;
+        newNote.setTitle(config.newNote->title);
     else
-        newNote.title = tr("Untitled Note");
+        newNote.setTitle(tr("Untitled Note"));
 
     // Process tags
-    newNote.tagGuids = QList<Guid>();
-    newNote.tagNames=QStringList();
+    newNote.setTagGuids(QList<Guid>());
+    newNote.setTagNames(QStringList());
     for (int i=0; i<config.newNote->tags.size(); i++) {
         QString tagName = config.newNote->tags[i];
         TagTable tagTable(global.db);
@@ -242,16 +242,16 @@ int CmdLineTool::addNote(StartupConfig config) {
         // Do we need to add the tag?
         if (tagLid == 0) {
             Tag tag;
-            tag.name = tagName;
+            tag.setName(tagName);
             NUuid uuid;
             tagGuid = uuid.create();
-            tag.guid = tagGuid;
+            tag.setGuid(tagGuid);
             tagTable.add(0, tag, true, 0);
         } else {
             tagTable.getGuid(tagGuid, tagLid);
         }
-        newNote.tagNames->append(tagName);
-        newNote.tagGuids->append(tagGuid);
+        newNote.mutableTagNames()->append(tagName);
+        newNote.mutableTagGuids()->append(tagGuid);
     }
 
     // Process the notebook
@@ -264,47 +264,47 @@ int CmdLineTool::addNote(StartupConfig config) {
         // Do we need to add the notebook?
         if (lid == 0) {
             Notebook book;
-            book.name = notebookName;
+            book.setName(notebookName);
             NUuid uuid;
             QString newGuid = uuid.create();
-            book.guid = newGuid;
+            book.setGuid(newGuid);
             notebookGuid = newGuid;
             lid = notebookTable.add(0, book, true, false);
         } else {
             notebookTable.getGuid(notebookGuid, lid);
         }
-        newNote.notebookGuid = notebookGuid;
+        newNote.setNotebookGuid(notebookGuid);
     } else {
         NotebookTable notebookTable(global.db);
-        newNote.notebookGuid = notebookTable.getDefaultNotebookGuid();
+        newNote.setNotebookGuid(notebookTable.getDefaultNotebookGuid());
     }
 
     // Do the dates
     if (config.newNote->created != "") {
         QString dateString = config.newNote->created;
         QDateTime date = QDateTime::fromString(dateString.trimmed(), "yyyy-MM-ddTHH:mm:ss.zzzZ");
-        newNote.created = date.toMSecsSinceEpoch();
+        newNote.setCreated(date.toMSecsSinceEpoch());
     }
     if (config.newNote->updated != "") {
         QString dateString = config.newNote->updated;
         QDateTime date = QDateTime::fromString(dateString, "yyyy-MM-ddTHH:mm:ss.zzzZ");
-        newNote.updated = date.toMSecsSinceEpoch();
+        newNote.setUpdated(date.toMSecsSinceEpoch());
     }
     if (config.newNote->reminder != "") {
         QString dateString = config.newNote->reminder;
         QDateTime date = QDateTime::fromString(dateString, "yyyy-MM-ddTHH:mm:ss.zzzZ");
         if (date > QDateTime::currentDateTime()) {
-            if (!newNote.attributes.isSet()) {
+            if (!newNote.attributes().has_value()) {
                 NoteAttributes na;
-                newNote.attributes = na;
+                newNote.setAttributes(na);
             }
-            newNote.attributes->reminderTime = date.toMSecsSinceEpoch();
+            newNote.mutableAttributes()->setReminderTime(date.toMSecsSinceEpoch());
         }
     }
 
 
     NoteTable noteTable(global.db);
-    qint32 newLid = noteTable.addStub(newNote.guid);
+    qint32 newLid = noteTable.addStub(*newNote.guid());
     // Do the attachments
     for (int i=0; i<config.newNote->attachments.size(); i++) {
         QString filename = config.newNote->attachments[i];
@@ -327,23 +327,24 @@ int CmdLineTool::addNote(StartupConfig config) {
                 attachment = false;
             config.newNote->createResource(newRes, 0, ba, mime, attachment, QFileInfo(filename).fileName(), newLid);
             QByteArray hash;
-            if (newRes.data.isSet()) {
-                Data d = newRes.data;
-                if (d.bodyHash.isSet())
-                    hash = d.bodyHash;
+            if (newRes.data().has_value()) {
+                Data d = *newRes.data();
+                if (d.bodyHash().has_value())
+                    hash = *d.bodyHash();
             }
-            if (!newNote.resources.isSet()) {
-                newNote.resources = QList<Resource>();
+            if (!newNote.resources().has_value()) {
+                newNote.setResources(QList<Resource>());
             }
             QString mediaString = "<en-media hash=\""+hash.toHex()+"\" type=\""+mime+"\"/>";
-            if (newNote.content->contains(config.newNote->attachmentDelimiter)) {
-                 //newNote.content = newNote.content->replace(config.newNote->attachmentDelimiter,mediaString);
-                 newNote.content = newNote.content->replace(newNote.content->indexOf(config.newNote->attachmentDelimiter),
+            QString content = *newNote.content();
+            if (newNote.content()->contains(config.newNote->attachmentDelimiter)) {
+                 content.replace(newNote.content()->indexOf(config.newNote->attachmentDelimiter),
                                                      config.newNote->attachmentDelimiter.size(), mediaString);
             } else {
-                newNote.content = newNote.content->replace("</en-note>","<br>"+mediaString+"</en-note>");
+                content.replace("</en-note>","<br>"+mediaString+"</en-note>");
             }
-            newNote.resources->append(newRes);
+            newNote.setContent(std::move(content));
+            newNote.mutableResources()->append(newRes);
         }
     }
     noteTable.expunge(newLid);
@@ -376,7 +377,7 @@ int CmdLineTool::appendNote(StartupConfig config) {
             content.append("<br>");
             content.replace("\n","<br>");
         }
-        config.newNote->content = QString::fromAscii(content);
+        config.newNote->content = QString::fromLocal8Bit(content);
     }
 
     if (!config.newNote->content.contains("<body")) {
@@ -403,14 +404,18 @@ int CmdLineTool::appendNote(StartupConfig config) {
     }
 
     // Append the text to the existing note
-    newNote.content->replace("</en-note>", "<br/>");
+    {
+        QString content = newNote.content().value_or(QString{});
+        content.replace("</en-note>", "<br/>");
+        newNote.setContent(std::move(content));
+    }
 
     // Chop off the beginning of the new text to remove the <en-note stuff
     int startOfNote = config.newNote->content.indexOf("<en-note");
     config.newNote->content = config.newNote->content.mid(startOfNote+9);
 
     // Append the two notes
-    newNote.content = newNote.content + config.newNote->content;
+    newNote.setContent(*newNote.content() + config.newNote->content);
 
     // Do the attachments
     for (int i=0; i<config.newNote->attachments.size(); i++) {
@@ -434,23 +439,24 @@ int CmdLineTool::appendNote(StartupConfig config) {
                 attachment = false;
             config.newNote->createResource(newRes, 0, ba, mime, attachment, QFileInfo(filename).fileName(), config.newNote->lid);
             QByteArray hash;
-            if (newRes.data.isSet()) {
-                Data d = newRes.data;
-                if (d.bodyHash.isSet())
-                    hash = d.bodyHash;
+            if (newRes.data().has_value()) {
+                Data d = *newRes.data();
+                if (d.bodyHash().has_value())
+                    hash = *d.bodyHash();
             }
-            if (!newNote.resources.isSet()) {
-                newNote.resources = QList<Resource>();
+            if (!newNote.resources().has_value()) {
+                newNote.setResources(QList<Resource>());
             }
             QString mediaString = "<en-media hash=\""+hash.toHex()+"\" type=\""+mime+"\"/>";
-            if (newNote.content->contains(config.newNote->attachmentDelimiter)) {
-                 //newNote.content = newNote.content->replace(config.newNote->attachmentDelimiter,mediaString);
-                 newNote.content = newNote.content->replace(newNote.content->indexOf(config.newNote->attachmentDelimiter),
-                                                     config.newNote->attachmentDelimiter.size(), mediaString);
+            QString content = *newNote.content();
+            if (content.contains(config.newNote->attachmentDelimiter)) {
+                 content = content.replace(content.indexOf(config.newNote->attachmentDelimiter),
+                                                           config.newNote->attachmentDelimiter.size(), mediaString);
             } else {
-                newNote.content = newNote.content->replace("</en-note>","<br>"+mediaString+"</en-note>");
+                content = content.replace("</en-note>","<br>"+mediaString+"</en-note>");
             }
-            newNote.resources->append(newRes);
+            newNote.setContent(std::move(content));
+            newNote.mutableResources()->append(newRes);
         }
     }
     noteTable.expunge(config.newNote->lid);
@@ -469,7 +475,7 @@ int CmdLineTool::readNote(StartupConfig config) {
     Note n;
     QString text;
     if (noteTable.get(n,config.extractText->lid,false,false)) {
-        text = config.extractText->stripTags(n.content);
+        text = config.extractText->stripTags(n.content().value_or(QString{}));
     } else {
         text = tr("Note not found.");
     }

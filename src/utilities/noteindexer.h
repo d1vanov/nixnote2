@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QTextDocument>
 #include <QList>
 
-#include "src/qevercloud/QEverCloud/headers/QEverCloud.h"
+#include "src/qevercloud/include/qevercloud/QEverCloud.h"
 using namespace qevercloud;
 
 using namespace std;

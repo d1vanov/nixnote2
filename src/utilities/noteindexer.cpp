@@ -59,13 +59,13 @@ void NoteIndexer::indexNotes(const QList<qint32> &lids) {
         Note n;
         ntable.get(n, lids[i],false,false);
 
-        if (n.title.isSet()) {
-            QLOG_DEBUG() << "Indexing note: " << n.title;
+        if (n.title().has_value()) {
+            QLOG_DEBUG() << "Indexing note: " << *n.title();
         }
 
         QString content = "";
-        if (n.content.isSet())
-            content = n.content;
+        if (n.content().has_value())
+            content = *n.content();
 
 
         // Start looking through the note
@@ -91,8 +91,8 @@ void NoteIndexer::indexNotes(const QList<qint32> &lids) {
         QTextDocument textDocument;
         textDocument.setHtml(content);
         QString title  = "";
-        if (n.title.isSet())
-            title = n.title;
+        if (n.title().has_value())
+            title = *n.title();
         content = textDocument.toPlainText() + " " + title;
         contentList.append(content);
     }
@@ -189,22 +189,22 @@ void NoteIndexer::indexResource(qint32 lid) {
     sql.exec();
 
     QLOG_DEBUG() << "Adding attributes to index.";
-    if (r.attributes.isSet()) {
-        ResourceAttributes a = r.attributes;
-        if (a.fileName.isSet()) {
+    if (r.attributes().has_value()) {
+        const ResourceAttributes & a = *r.attributes();
+        if (a.fileName().has_value()) {
             sql.prepare("Insert into SearchIndex (lid, weight, source, content) values (:lid, :weight, :source, :content)");
             sql.bindValue(":lid", lid);
             sql.bindValue(":weight", 100);
             sql.bindValue(":source", "recognition");
-            sql.bindValue(":content", QString(a.fileName));
+            sql.bindValue(":content", *a.fileName());
             sql.exec();
         }
-        if (a.sourceURL.isSet()) {
+        if (a.sourceURL().has_value()) {
             sql.prepare("Insert into SearchIndex (lid, weight, source, content) values (:lid, :weight, :source, :content)");
             sql.bindValue(":lid", lid);
             sql.bindValue(":weight", 100);
             sql.bindValue(":source", "recognition");
-            sql.bindValue(":content", QString(a.sourceURL));
+            sql.bindValue(":content", *a.sourceURL());
             sql.exec();
         }
     }
@@ -212,8 +212,8 @@ void NoteIndexer::indexResource(qint32 lid) {
     QLOG_TRACE() << "Indexing recognition";
     indexRecognition(lid, r);
     QString mime = "";
-    if (r.mime.isSet())
-        mime = r.mime;
+    if (r.mime().has_value())
+        mime = *r.mime();
     if (mime.toLower() == "application/pdf")
         this->indexPdf(lid);
 //    else {
@@ -233,7 +233,7 @@ void NoteIndexer::indexResource(qint32 lid) {
 void NoteIndexer::indexRecognition(qint32 reslid, Resource &r) {
 
     QLOG_TRACE_IN();
-    if (!r.noteGuid.isSet() || !r.guid.isSet())
+    if (!r.noteGuid().has_value() || !r.guid().has_value())
         return;
 
     if (reslid <= 0)
@@ -243,14 +243,14 @@ void NoteIndexer::indexRecognition(qint32 reslid, Resource &r) {
 
     // Make sure we have something to look through.
     Data recognition;
-    if (r.recognition.isSet())
-        recognition = r.recognition;
-    if (!recognition.body.isSet())
+    if (r.recognition().has_value())
+        recognition = *r.recognition();
+    if (!recognition.body().has_value())
         return;
 
     QDomDocument doc;
     QString emsg;
-    doc.setContent(recognition.body, &emsg);
+    doc.setContent(*recognition.body(), &emsg);
 
     // look for text tags
     QDomNodeList anchors = doc.documentElement().elementsByTagName("t");

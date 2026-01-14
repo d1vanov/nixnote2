@@ -78,9 +78,9 @@ int AlterNote::alterNote() {
             qint32 notebookLid = bookTable.findByName(notebook);
             if (notebookLid<0) {
                 Notebook book;
-                book.name = notebook;
+                book.setName(notebook);
                 NUuid uuid;
-                book.guid = uuid.create();
+                book.setGuid(uuid.create());
                 notebookLid = bookTable.add(0,book,true);
             }
             if (noteTable.getNotebookLid(lid) != notebookLid)
@@ -92,9 +92,9 @@ int AlterNote::alterNote() {
             qint32 tagLid = tagTable.findByName(addTagNames[j],0);
             if (tagLid <= 0) {
                 Tag t;
-                t.name = addTagNames[j];
+                t.setName(addTagNames[j]);
                 NUuid uuid;
-                t.guid = uuid.create();
+                t.setGuid(uuid.create());
                 tagLid = tagTable.add(0,t,true,0);
             }
             if (!noteTable.hasTag(lid,tagLid))

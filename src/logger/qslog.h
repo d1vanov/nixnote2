@@ -28,7 +28,6 @@
 
 #include <QDebug>
 #include <QString>
-#include <typeinfo>
 
 namespace QsLogging {
     class Destination;

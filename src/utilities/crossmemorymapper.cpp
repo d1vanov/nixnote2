@@ -133,7 +133,7 @@ size_t CrossMemoryMapper::getSharedMemorySize() const {
 }
 
 void CrossMemoryMapper::write(QString value) {
-    write(value.toAscii());
+    write(value.toUtf8());
 }
 
 void CrossMemoryMapper::write(QByteArray data) {
