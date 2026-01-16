@@ -77,7 +77,7 @@ WatchFolderAdd::WatchFolderAdd(qint32 lid, QWidget *parent) :
     for (int i=0; i<lids.size(); i++) {
         Notebook n;
         ntable.get(n, lids[i]);
-        books->addItem(n.name, lids[i]);
+        books->addItem(n.name().value_or(QString{}), lids[i]);
         if (lids[i] == notebookLid)
             books->setCurrentIndex(i);
     }

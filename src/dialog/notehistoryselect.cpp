@@ -84,18 +84,18 @@ void NoteHistorySelect::loadData(QList<NoteVersionId> &versions) {
     this->versions = &versions;
     for (int i=0; i<versions.size(); i++) {
         QListWidgetItem *item = new QListWidgetItem(&list);
-        item->setData(Qt::UserRole, versions.at(i).updateSequenceNum);
+        item->setData(Qt::UserRole, versions.at(i).updateSequenceNum());
         QString text;
 
         QDateTime timestamp;
-        timestamp.setTime_t(versions.at(i).saved/1000);
+        timestamp.setTime_t(versions.at(i).saved()/1000);
         if (timestamp.date() == QDate::currentDate())
             text = tr("Today") +" " + timestamp.time().toString(Qt::SystemLocaleShortDate);
         if (timestamp.date() == QDate::currentDate().addDays(-1))
             text = tr("Yesterday") +" " + timestamp.time().toString(Qt::SystemLocaleShortDate);
         text = timestamp.toString(global.getDateTimeFormat());
 
-        text = text + " : "+ versions.at(i).title;
+        text = text + " : "+ versions.at(i).title();
         item->setText(text);
         list.addItem(item);
     }

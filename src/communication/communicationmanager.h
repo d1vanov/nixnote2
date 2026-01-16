@@ -82,8 +82,8 @@ private:
     qint32 minutesToNextSync;                    // After "API rate limit exceeded" how long should we wait to attempt sync notes (continue syncing large lists of notes - for example when user setup nixnote for first time)
 
 
-    void downloadInkNoteImage(QString guid, Resource *r, QString shard, QString authToken);   // Function to download ink notes
-    void checkForInkNotes(QList<Resource> &resources, QString shard, QString authToken);      // Check if a resource list has any ink notes
+    void downloadInkNoteImage(QString guid, const Resource *r, QString shard, QString authToken);   // Function to download ink notes
+    void checkForInkNotes(const QList<Resource> &resources, QString shard, QString authToken);      // Check if a resource list has any ink notes
 
     QString authToken;                        // Authorization token.
     QString shardId;
@@ -91,10 +91,10 @@ private:
     QNetworkAccessManager *networkAccessManager;              // Network connection to download inknotes
     void handleEDAMSystemException(EDAMSystemException e, QString additionalInfo = "");
     void handleEDAMNotFoundException(EDAMNotFoundException e, QString additionalInfo = "");
-    IUserStore *userStore;                                     // UserStore class
-    INoteStore *noteStore;                                     // Notestore class
-    INoteStore *linkedNoteStore;                               // Linked notestore class
-    INoteStore *myNoteStore;                                   // local account notestore class
+    IUserStorePtr userStore;                                     // UserStore class
+    INoteStorePtr noteStore;                                     // Notestore class
+    INoteStorePtr linkedNoteStore;                               // Linked notestore class
+    INoteStorePtr myNoteStore;                                   // local account notestore class
     void processSyncChunk(SyncChunk &chunk, QString token);   // Deal with a sync chunk.
     void dumpNote(const Note &note) const;
     void reportError(const CommunicationError::CommunicationErrorType errorType,

@@ -92,7 +92,7 @@ CloseNotebookDialog::CloseNotebookDialog(QWidget *parent) :
         Notebook notebook;
         bookTable.get(notebook, openLids[i]);
         item->setData(Qt::UserRole, openLids[i]);
-        item->setText(notebook.name);
+        item->setText(notebook.name().value());
         openNotebooks.addItem(item);
     }
     openNotebooks.sortItems();
@@ -102,7 +102,7 @@ CloseNotebookDialog::CloseNotebookDialog(QWidget *parent) :
         Notebook notebook;
         bookTable.get(notebook, closedLids[i]);
         item->setData(Qt::UserRole, closedLids[i]);
-        item->setText(notebook.name);
+        item->setText(notebook.name().value());
         closeNotebooks.addItem(item);
     }
     closeNotebooks.sortItems();

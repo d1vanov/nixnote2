@@ -64,7 +64,7 @@ void TagProperties::okButtonPressed() {
         Tag tag;
         TagTable table(global.db);
         table.get(tag, lid);
-        tag.name = this->name.text().trimmed();
+        tag.setName(this->name.text().trimmed());
         table.update(tag, true);
         close();
         return;
@@ -72,10 +72,10 @@ void TagProperties::okButtonPressed() {
 
     // We have a new tag to add
     Tag tag;
-    tag.name = name.text().trimmed();
+    tag.setName(name.text().trimmed());
     QUuid uuid;
     QString g =  uuid.createUuid().toString().replace("{","").replace("}","");
-    tag.guid = g;
+    tag.setGuid(g);
     TagTable t(global.db);
     t.add(0,tag,true, account);
     close();
@@ -93,7 +93,7 @@ void TagProperties::setLid(qint32 lid) {
         Tag tag;
         TagTable table(global.db);
         table.get(tag, lid);
-        originalName = tag.name;
+        originalName = tag.name().value_or(QString{});
         name.setText(originalName.trimmed());
         account = table.owningAccount(lid);
         return;

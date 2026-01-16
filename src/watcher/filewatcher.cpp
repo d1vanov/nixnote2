@@ -117,26 +117,26 @@ void FileWatcher::saveFile(QString filename) {
     QByteArray hash = md5hash.hash(data, QCryptographicHash::Md5);
 
     // * Start setting up the new note
-    newNote.guid = QString::number(lid);
-    newNote.title = filename;
+    newNote.setGuid(QString::number(lid));
+    newNote.setTitle(filename);
 
     NotebookTable bookTable(global.db);
     QString notebook;
     bookTable.getGuid(notebook, notebookLid);
-    newNote.notebookGuid = notebook;
-    newNote.active = true;
-    newNote.created = QDateTime::currentMSecsSinceEpoch();;
-    newNote.updated = newNote.created;
-    newNote.updateSequenceNum = 0;
+    newNote.setNotebookGuid(notebook);
+    newNote.setActive(true);
+    newNote.setCreated(QDateTime::currentMSecsSinceEpoch());
+    newNote.setUpdated(newNote.created());
+    newNote.setUpdateSequenceNum(0);
     NoteAttributes na;
 // Windows Check
 #ifndef _WIN32
-    na.sourceURL = "file://" + filename;
+    na.setSourceURL("file://" + filename);
 #else
-    na.sourceURL = "file:///" + filename;
+    na.setSourceURL("file:///" + filename);
 #endif  // end Windows check
-    na.subjectDate = newNote.created;
-    newNote.attributes = na;
+    na.setSubjectDate(newNote.created());
+    newNote.setAttributes(na);
 
     qint32 noteLid = lid;
 
@@ -160,8 +160,8 @@ void FileWatcher::saveFile(QString filename) {
     QString newNoteBody = QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+
            QString("<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">")+
            QString("<en-note style=\"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;\">");
-    if (newNote.content.isSet())
-        newNoteBody.append(newNote.content);
+    if (newNote.content().has_value())
+        newNoteBody.append(*newNote.content());
 
     MimeReference mimeRef;
     QString mime = mimeRef.getMimeFromFileName(filename);
@@ -169,7 +169,7 @@ void FileWatcher::saveFile(QString filename) {
             +QString(" type=\"" +mime +"\" ")
             +QString("/>");
     newNoteBody.append(enMedia + QString("</en-note>"));
-    newNote.content = newNoteBody;
+    newNote.setContent(newNoteBody);
     ntable.add(lid, newNote, true);
     QString noteGuid = ntable.getGuid(lid);
     lid = cs.incrementLidCounter();
@@ -178,22 +178,22 @@ void FileWatcher::saveFile(QString filename) {
     // Start creating the new resource
     Resource newRes;
     Data d;
-    d.body = data;
-    d.bodyHash = hash;
-    d.size = data.size();
-    newRes.data = d;
-    newRes.mime = mime;
+    d.setBody(data);
+    d.setBodyHash(hash);
+    d.setSize(data.size());
+    newRes.setData(d);
+    newRes.setMime(mime);
     ResourceAttributes ra;
-    ra.fileName = QFileInfo(f).fileName();
+    ra.setFileName(QFileInfo(f).fileName());
     if (mime.startsWith("image", Qt::CaseInsensitive) || mime.endsWith("pdf", Qt::CaseInsensitive))
-        ra.attachment = false;
+        ra.setAttachment(false);
     else
-        ra.attachment = true;
-    newRes.active = true;
-    newRes.guid = QString::number(lid);
-    newRes.noteGuid = noteGuid;
-    newRes.updateSequenceNum = 0;
-    newRes.attributes = ra;
+        ra.setAttachment(true);
+    newRes.setActive(true);
+    newRes.setGuid(QString::number(lid));
+    newRes.setNoteGuid(noteGuid);
+    newRes.setUpdateSequenceNum(0);
+    newRes.setAttributes(ra);
     ResourceTable restable(global.db);
     restable.add(lid, newRes, true, noteLid);
 
@@ -286,19 +286,19 @@ void FileWatcher::exitPoint(ExitPoint *exit, Note &n) {
     // Start loading values
     QLOG_INFO() << tr("Calling exit ") << exit->getExitName();
     saveExit->setExitName(exit->getExitName());
-    saveExit->setTitle(n.title);
+    saveExit->setTitle(n.title().value_or(QString{}));
     NotebookTable bookTable(global.db);
     Notebook book;
-    bookTable.get(book, n.notebookGuid);
-    if (!book.name.isSet())
-        book.name = "unknown";
-    saveExit->setNotebook(book.name);
-    saveExit->setCreationDate(n.created);
-    saveExit->setUpdatedDate(n.updated);
-    saveExit->setSubjectDate(n.attributes->subjectDate);
+    bookTable.get(book, n.notebookGuid().value());
+    if (!book.name().has_value())
+        book.setName("unknown");
+    saveExit->setNotebook(*book.name());
+    saveExit->setCreationDate(n.created().value());
+    saveExit->setUpdatedDate(n.updated().value());
+    saveExit->setSubjectDate(n.attributes()->subjectDate().value());
 //    saveExit->setTags(n.tagNames);
     saveExit->setContents("");
-    saveExit->setFileName(n.attributes->sourceURL);
+    saveExit->setFileName(n.attributes()->sourceURL().value());
 
     // Set exit ready & call it.
     saveExit->setExitReady();
@@ -320,7 +320,7 @@ void FileWatcher::exitPoint(ExitPoint *exit, Note &n) {
 
     // Check for any changes.
     if (saveExit->isTitleModified()) {
-        n.title = saveExit->getTitle();
+        n.setTitle(saveExit->getTitle());
     }
     if (saveExit->isTagsModified()) {
         QStringList tagNames = saveExit->getTags();
@@ -341,8 +341,8 @@ void FileWatcher::exitPoint(ExitPoint *exit, Note &n) {
             } else
                 QLOG_ERROR() << tr("Tag was not found:") << tagName;
         }
-        n.tagGuids = newTagGuids;
-        n.tagNames = newTagNames;
+        n.setTagGuids(newTagGuids);
+        n.setTagNames(newTagNames);
     }
     if (saveExit->isNotebookModified()) {
         NotebookTable ntable(global.db);
@@ -351,7 +351,7 @@ void FileWatcher::exitPoint(ExitPoint *exit, Note &n) {
         if (notebookLid >0) {
             QString notebookGuid = "";
             if (ntable.getGuid(notebookGuid, notebookLid))
-                n.notebookGuid = notebookGuid;
+                n.setNotebookGuid(notebookGuid);
             else
                 QLOG_ERROR() << tr("Notebook was not found:") << notebookName;
         } else
@@ -359,7 +359,7 @@ void FileWatcher::exitPoint(ExitPoint *exit, Note &n) {
     }
     if (saveExit->isContentsModified()) {
         QByteArray data = saveExit->getContents().toUtf8();
-        n.content = data;
+        n.setContent(data);
     }
 
     QLOG_TRACE_OUT();

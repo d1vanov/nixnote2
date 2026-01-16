@@ -177,7 +177,7 @@ void EmailNote::prepareEmailMessage(MimeMessage *message, QString note, QString 
     if (note.trimmed() != "") {
         int pos = contents.indexOf("<body");
         int endPos = contents.indexOf(">", pos);
-        contents.insert(endPos+1,  Qt::escape(note)+"<p><p><hr><p>");
+        contents.insert(endPos+1,  note.toHtmlEscaped()+"<p><p><hr><p>");
     }
     text->setHtml(contents);
     message->addPart(text);
@@ -194,10 +194,10 @@ void EmailNote::prepareEmailMessage(MimeMessage *message, QString note, QString 
         ResourceTable rtable(global.db);
         Resource r;
         ResourceAttributes ra;
-        if (rtable.get(r, lid, false) && r.attributes.isSet()) {
-            ra = r.attributes;
-            if (ra.fileName.isSet())
-                file->setContentName(ra.fileName);
+        if (rtable.get(r, lid, false) && r.attributes().has_value()) {
+            ra = *r.attributes();
+            if (ra.fileName().has_value())
+                file->setContentName(*ra.fileName());
         }
         file->setContentId("file"+QString::number(i+1));
         file->setContentType(mime);
@@ -215,10 +215,10 @@ void EmailNote::prepareEmailMessage(MimeMessage *message, QString note, QString 
         ResourceTable rtable(global.db);
         Resource r;
         ResourceAttributes ra;
-        if (rtable.get(r, lid, false) && r.attributes.isSet()) {
-            ra = r.attributes;
-            if (ra.fileName.isSet())
-                file->setContentName(ra.fileName);
+        if (rtable.get(r, lid, false) && r.attributes().has_value()) {
+            ra = *r.attributes();
+            if (ra.fileName().has_value())
+                file->setContentName(*ra.fileName());
         }
         file->setContentType(mime);
         message->addPart(file);
