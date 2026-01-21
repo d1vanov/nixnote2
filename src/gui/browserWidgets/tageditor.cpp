@@ -136,11 +136,11 @@ void TagEditor::addTag(QString text) {
     Tag newTag;
     if (tagLid <=0) {
         QUuid uuid;
-        newTag.name = text;
+        newTag.setName(text);
         QString newGuid = uuid.createUuid().toString().replace("{", "").replace("}", "");
-        newTag.guid = newGuid;
+        newTag.setGuid(newGuid);
         tagTable.add(0, newTag, true, account);
-        tagLid = tagTable.getLid(newTag.guid);
+        tagLid = tagTable.getLid(*newTag.guid());
         emit(newTagCreated(tagLid));
     }
     noteTable.addTag(currentLid, tagLid, true);
@@ -186,8 +186,8 @@ void TagEditor::reloadTags() {
     noteTable.get(n, currentLid, false, false);
     QStringList names;
     QList<QString> tagNames;
-    if (n.tagNames.isSet())
-        tagNames = n.tagNames;
+    if (n.tagNames().has_value())
+        tagNames = *n.tagNames();
     for (int i=0; i<tagNames.size(); i++) {
         names << tagNames[i];
     }

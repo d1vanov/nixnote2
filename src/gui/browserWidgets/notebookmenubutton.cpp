@@ -58,24 +58,24 @@ void NotebookMenuButton::setCurrentNotebook(int lid, Note note) {
     currentNoteLid = lid;
     NotebookTable notebookTable(global.db);
     Notebook notebook;
-    notebookTable.get(notebook, note.notebookGuid);
+    notebookTable.get(notebook, note.notebookGuid().value());
     if (currentAction < actions.size())
         actions[currentAction]->setChecked(false);
-    if (notebook.name.isSet())
-        this->setText(notebook.name);
+    if (notebook.name().has_value())
+        this->setText(*notebook.name());
     for (int i=0; i<actions.size(); i++) {
         actions[i]->setChecked(false);
         QString notebookname = "";
-        if (notebook.name.isSet())
-            notebookname = notebook.name;
+        if (notebook.name().has_value())
+            notebookname = *notebook.name();
         if (actions[i]->text().toLower().trimmed() == notebookname.toLower().trimmed()) {
             currentAction = i;
             actions[currentAction]->setChecked(true);
         }
     }
-    notebookLid = notebookTable.getLid(note.notebookGuid);
-    if (notebook.name.isSet())
-        notebookName = notebook.name;
+    notebookLid = notebookTable.getLid(note.notebookGuid().value());
+    if (notebook.name().has_value())
+        notebookName = *notebook.name();
     blockSignals(false);
 }
 
@@ -119,7 +119,7 @@ void NotebookMenuButton::loadData() {
 
             QAction *action = new QAction(this);
             actions.append(action);
-            action->setText(book.name);
+            action->setText(book.name().value());
             action->setCheckable(true);
             connect(action, SIGNAL(triggered()), this, SLOT(notebookSelected()));
             QFont f = action->font();
@@ -129,15 +129,15 @@ void NotebookMenuButton::loadData() {
 
             addNotebookMenuItem(currentMenu, action);
 
-            if (currentNotebookName == "" && book.defaultNotebook.isSet() &&
-                    book.defaultNotebook) {
-                currentNotebookName = book.name;
+            if (currentNotebookName == "" && book.defaultNotebook().has_value() &&
+                    *book.defaultNotebook()) {
+                currentNotebookName = book.name().value();
                 setText(currentNotebookName);
                 currentAction = actions.size()-1;
             }
             QString bookname = "";
-            if (book.name.isSet())
-                bookname = book.name;
+            if (book.name().has_value())
+                bookname = *book.name();
             if (bookname == currentNotebookName) {
                 action->setChecked(true);
             }
@@ -181,8 +181,8 @@ void NotebookMenuButton::addNotebookMenuItem(QMenu *menu, QAction *action) {
 // this notebook's stack.  If one doesn't exist we add it.
 QMenu* NotebookMenuButton::findStack(Notebook n) {
     QString stack = "";
-    if (n.stack.isSet())
-        stack = n.stack;
+    if (n.stack().has_value())
+        stack = *n.stack();
     stack = stack.trimmed();
     if (stack == "")
         return &rootMenu;
@@ -257,7 +257,7 @@ void NotebookMenuButton::reloadData() {
         NoteTable noteTable(global.db);
         NotebookTable notebookTable(global.db);
         if (noteTable.get(n, currentNoteLid, false, false)) {
-            QString notebookGuid = n.notebookGuid;
+            QString notebookGuid = n.notebookGuid().value();
             QList<qint32> bookList;
             notebookTable.getAll(bookList);
             QString bookName;
@@ -265,8 +265,8 @@ void NotebookMenuButton::reloadData() {
             for (int i=0; i<bookList.size(); i++) {
                 Notebook book;
                 notebookTable.get(book, bookList[i]);
-                if (notebookGuid == book.guid) {
-                    bookName = book.name;
+                if (notebookGuid == book.guid()) {
+                    bookName = book.name().value();
                     i=bookList.size();
                 }
             }

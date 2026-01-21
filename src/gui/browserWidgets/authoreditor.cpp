@@ -93,10 +93,10 @@ void AuthorEditor::textModified(QString text) {
     noteTable.get(n, currentLid, false,false);
     QString oldAuthor;
     NoteAttributes attributes;
-    if (n.attributes.isSet())
-        attributes = n.attributes;
-    if (attributes.author.isSet())
-        oldAuthor = attributes.author;
+    if (n.attributes().has_value())
+        attributes = *n.attributes();
+    if (attributes.author().has_value())
+        oldAuthor = *attributes.author();
     if (oldAuthor.trimmed() != text.trimmed())
         noteTable.updateAuthor(currentLid, text, true);
 

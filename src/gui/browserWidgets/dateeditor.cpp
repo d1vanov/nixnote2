@@ -65,31 +65,31 @@ DateEditor::DateEditor(QWidget *parent) :
 }
 
 void DateEditor::setNote(qint32 lid, Note n) {
-    createdDate.setNote(lid, n.created, NOTE_CREATED_DATE);
-    updatedDate.setNote(lid, n.updated, NOTE_UPDATED_DATE);
+    createdDate.setNote(lid, n.created().value(), NOTE_CREATED_DATE);
+    updatedDate.setNote(lid, n.updated().value(), NOTE_UPDATED_DATE);
     NoteAttributes attributes;
-    if (n.attributes.isSet())
-        attributes = n.attributes;
-    if (attributes.subjectDate.isSet() && attributes.subjectDate > 0)
-        subjectDate.setNote(lid, attributes.subjectDate, NOTE_ATTRIBUTE_SUBJECT_DATE);
+    if (n.attributes().has_value())
+        attributes = *n.attributes();
+    if (attributes.subjectDate().has_value() && *attributes.subjectDate() > 0)
+        subjectDate.setNote(lid, *attributes.subjectDate(), NOTE_ATTRIBUTE_SUBJECT_DATE);
     else
-        subjectDate.setNote(lid, n.updated, NOTE_ATTRIBUTE_SUBJECT_DATE);
+        subjectDate.setNote(lid, n.updated().value(), NOTE_ATTRIBUTE_SUBJECT_DATE);
 
     QString author;
-    if (attributes.author.isSet())
-        author = attributes.author;
+    if (attributes.author().has_value())
+        author = *attributes.author();
     authorEditor.setAuthor(lid, author.trimmed());
 
     double longitude=0, altitude=0, latitude=0;
     QString placeName = "";
-    if (attributes.longitude.isSet())
-        longitude = attributes.longitude;
-    if (attributes.latitude.isSet())
-        latitude = attributes.latitude;
-    if (attributes.altitude.isSet())
-        altitude = attributes.altitude;
-    if (attributes.placeName.isSet())
-        placeName = attributes.placeName;
+    if (attributes.longitude().has_value())
+        longitude = *attributes.longitude();
+    if (attributes.latitude().has_value())
+        latitude = *attributes.latitude();
+    if (attributes.altitude().has_value())
+        altitude = *attributes.altitude();
+    if (attributes.placeName().has_value())
+        placeName = *attributes.placeName();
     locationEditor.setGeography(lid, longitude,latitude, altitude, placeName);
 }
 

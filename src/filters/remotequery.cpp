@@ -69,8 +69,8 @@ Q_SCRIPTABLE bool RemoteQuery::setNote(qint32 lid) {
 Q_SCRIPTABLE QString RemoteQuery::getNoteTitle() {
     if (note == nullptr)
         return "";
-    if (note->title.isSet())
-        return note->title;
+    if (note->title().has_value())
+        return *note->title();
     return "";
 }
 
@@ -102,8 +102,8 @@ Q_SCRIPTABLE QString RemoteQuery::getNotePreview() {
 
 Q_SCRIPTABLE QString RemoteQuery::getNoteDateUpdated() {
     qlonglong dt = 0;
-    if (note->updated.isSet())
-        dt = note->updated;
+    if (note->updated().has_value())
+        dt = *note->updated();
     if (dt==0)
         return "";
     QDateTime timestamp;
@@ -119,8 +119,8 @@ Q_SCRIPTABLE QString RemoteQuery::getNoteDateUpdated() {
 
 Q_SCRIPTABLE QString RemoteQuery::getNoteDateCreated() {
     qlonglong dt = 0;
-    if (note->created.isSet())
-        dt = note->created;
+    if (note->created().has_value())
+        dt = *note->created();
     if (dt==0)
         return "";
     QDateTime timestamp;
@@ -136,10 +136,10 @@ Q_SCRIPTABLE QString RemoteQuery::getNoteDateCreated() {
 
 
 Q_SCRIPTABLE QString RemoteQuery::getNoteTags() {
-    if (!note->tagNames.isSet())
+    if (!note->tagNames().has_value())
         return "";
     QString taglist = "";
-    QList <QString> tagNames = note->tagNames;
+    QList <QString> tagNames = *note->tagNames();
     for (int i=0; i<tagNames.size(); i++) {
         if (taglist.size()>0)
             taglist = taglist +", ";
